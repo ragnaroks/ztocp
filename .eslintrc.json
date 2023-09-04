@@ -1,0 +1,34 @@
+{
+  "parser":"@typescript-eslint/parser",
+  "extends": "next/core-web-vitals",
+  "plugins": ["react-hooks","@typescript-eslint/eslint-plugin"],
+  "globals":{
+    "window":true
+  },
+  "rules": {
+    "no-console":"off",
+    "semi": ["error", "always"],
+    "key-spacing":["error",{"beforeColon": false,"afterColon": false}],
+    "spaced-comment": ["off"],
+    "space-before-blocks": ["off"],
+    "object-shorthand": ["error", "never"],
+    "space-before-function-paren": ["error", "never"],
+    "space-infix-ops":["off"],
+    /*"no-unused-vars":["warn"],*/
+    "@typescript-eslint/no-unused-vars":["warn"],
+    "new-cap":["off"],
+    "comma-spacing":["off"],
+    "object-curly-spacing":["error","never"],
+    "keyword-spacing":["off"],
+    "block-spacing":["off"],
+    "brace-style":["off"],
+    "semi-spacing":["error",{"before":false,"after":false}],
+    "object-property-newline":["off"],
+    "arrow-spacing":["error",{"before":false,"after":false}],
+    /*react*/
+    "react-hooks/rules-of-hooks":"error",
+    "react-hooks/exhaustive-deps":["warn",{"additionalHooks": "useRecoilCallback"}],
+    /*nextjs*/
+    "@next/next/no-img-element":["off"]
+  }
+}

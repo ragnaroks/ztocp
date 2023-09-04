@@ -1,0 +1,35 @@
+{
+  "name": "ztocp",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "caddy": "caddy\\caddy.exe run --config caddy\\caddy.develop.json",
+    "dev": "next dev",
+    "lint": "next lint",
+    "build": "next build",
+    "contains": "podman system connection default cn2 && podman build --tag docker.io/ragnaroks/ztocp:0.1.1 . && podman push docker.io/ragnaroks/ztocp:0.1.1 && podman system connection default local"
+  },
+  "dependencies": {
+    "@mdi/js": "7.2.96",
+    "dayjs": "1.11.7",
+    "ip-address": "8.1.0",
+    "next": "13.4.19",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hot-toast": "2.4.1",
+    "swr": "2.1.5",
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.2.5",
+    "@types/react": "18.2.7",
+    "@types/uuid": "9.0.1",
+    "autoprefixer": "10.4.14",
+    "eslint": "8.41.0",
+    "eslint-config-next": "13.4.4",
+    "file-loader": "6.2.0",
+    "postcss": "8.4.24",
+    "tailwindcss": "3.3.2",
+    "typescript": "5.0.4"
+  }
+}

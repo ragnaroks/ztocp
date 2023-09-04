@@ -1,0 +1,91 @@
+{
+  "admin":{
+    "disabled":true
+  },
+  "apps": {
+    "http": {
+      "servers": {
+        "ztocp": {
+          "listen": ["0.0.0.0:9994"],
+          "routes": [
+            {
+              "match":[
+                {
+                  "path":["/zerotier/*"]
+                }
+              ],
+              "handle":[
+                {
+                  "handler":"authentication",
+                  "providers":{
+                    "http_basic":{
+                      "hash":{
+                        "algorithm": "bcrypt"
+                      },
+                      "accounts":[
+                        {"username":"username","password":"$2a$10$egkd8sE7eGclIohEJBYYr.9Ck3KKN2Zgiq7/7WpFUY/Ats.Mzt9ja","salt":""}
+                      ]
+                    }
+                  }
+                },{
+                  "handler": "reverse_proxy",
+                  "transport":{
+                    "protocol":"http",
+                    "keep_alive":{
+                      "enabled":true,
+                      "probe_interval":30,
+                      "max_idle_conns":2
+                    }
+                  },
+                  "upstreams":[
+                    {"dial":"127.0.0.1:9993"}
+                  ],
+                  "headers":{
+                    "request":{
+                      "add":{
+                        "X-ZT1-AUTH":["cgaydu2bb86joooaz8qwyj5p"]
+                      }
+                    }
+                  },
+                  "rewrite":{
+                    "strip_path_prefix":"/zerotier"
+                  }
+                }
+              ]
+            },{
+              "match":[
+                {
+                  "path":["*"]
+                }
+              ],
+              "handle":[
+                {
+                  "handler":"authentication",
+                  "providers":{
+                    "http_basic":{
+                      "hash":{
+                        "algorithm": "bcrypt"
+                      },
+                      "accounts":[
+                        {"username":"username","password":"$2a$10$egkd8sE7eGclIohEJBYYr.9Ck3KKN2Zgiq7/7WpFUY/Ats.Mzt9ja","salt":""}
+                      ]
+                    }
+                  }
+                },{
+                  "handler": "file_server",
+                  "root":"/website/",
+                  "index_names":["index.html"],
+                  "canonical_uris":true,
+                  "precompressed":{"br":{},"zstd":{},"gzip":{"level":1}}
+                }
+              ]
+            }
+          ],
+          "automatic_https":{
+            "disable":true
+          }
+        }
+      }
+    }
+  }
+}
