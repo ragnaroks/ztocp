@@ -1,13 +1,13 @@
 {
   "name": "ztocp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "caddy": "caddy\\caddy.exe run --config caddy\\caddy.develop.json",
     "dev": "next dev",
     "lint": "next lint",
     "build": "next build",
-    "contains": "podman system connection default cn2 && podman build --tag docker.io/ragnaroks/ztocp:0.1.1 . && podman push docker.io/ragnaroks/ztocp:0.1.1 && podman system connection default local"
+    "contains": "podman system connection default cn2 && podman build --tag docker.io/ragnaroks/ztocp:latest . && podman push docker.io/ragnaroks/ztocp:latest && podman system connection default local"
   },
   "dependencies": {
     "@mdi/js": "7.2.96",

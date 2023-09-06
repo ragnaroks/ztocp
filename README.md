@@ -25,7 +25,7 @@ podman container create \
 --volume /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro \
 --volume ztocp-caddy-config:/etc/caddy \
 --env TZ=Asia/Shanghai \
-docker.io/ragnaroks/ztocp:0.1.1
+docker.io/ragnaroks/ztocp:latest
 
 podman start ztocp
 
