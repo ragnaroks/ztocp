@@ -92,9 +92,9 @@ export default function PageMemberItemChild(props:DefaultComponentProps & {
       <span className="flex-shrink-0 w-4/12">6plane 地址：{sixplane ? generateZerotier6PLANE(networkId,data.address) : '未启用'}</span>
     </div>
     <div className="text-sm flex mt-3">
-      <span className="flex-shrink-0 w-2/12 flex items-center">授权访问：<input disabled={updateMutating} type="checkbox" checked={data.authorized} onClick={handleClickAuthorized} /></span>
-      <span className="flex-shrink-0 w-2/12 flex items-center">允许桥接：<input disabled={updateMutating} type="checkbox" checked={data.activeBridge} onClick={handleClickActiveBridge} /></span>
-      <span className="flex-shrink-0 w-2/12 flex items-center">不自动分配托管地址：<input disabled={updateMutating} type="checkbox" checked={data.noAutoAssignIps} onClick={handleClickNoAutoAssignIps} /></span>
+      <span className="flex-shrink-0 w-2/12 flex items-center">授权访问：<input disabled={updateMutating} type="checkbox" readOnly checked={data.authorized} onClick={handleClickAuthorized} /></span>
+      <span className="flex-shrink-0 w-2/12 flex items-center">允许桥接：<input disabled={updateMutating} type="checkbox" readOnly checked={data.activeBridge} onClick={handleClickActiveBridge} /></span>
+      <span className="flex-shrink-0 w-2/12 flex items-center">不自动分配托管地址：<input disabled={updateMutating} type="checkbox" readOnly checked={data.noAutoAssignIps} onClick={handleClickNoAutoAssignIps} /></span>
       <span className="flex-shrink-0 w-2/12" />
       <span className="flex-shrink-0 w-2/12 flex items-center"><button disabled={updateMutating} className="px-1 border border-site-zerotier/100 text-orange-500/100 disabled:border-stone-300/100 disabled:text-stone-500/100" onClick={handleClickDeleteMember}>删除成员</button></span>
     </div>

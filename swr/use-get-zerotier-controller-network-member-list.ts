@@ -12,19 +12,18 @@ const fetchAsync = async function(key:{url:string}) : Promise<Array<{memberAddre
     throw '网络请求错误';
   }
   if(!response.ok){throw '网络请求错误（'+response.status+'）';}
-  let data:Array<{[key:string]:number}>|null = null;
+  let data:null|{[key:string]:number} = null;
   try{
-    data = await response.json() as unknown as Array<{[key:string]:number}>;
+    data = await response.json() as unknown as {[key:string]:number};
   }catch(exception:unknown){
     console.warn(exception);
     throw '数据解析错误';
   }
   const array:Array<{memberAddress:string,memberRevisionCounter:number}> = [];
-  if(data.length<1){return array;}
-  for (const iterator of data) {
-    const key:string = Object.keys(iterator).at(0) || '';
+  const keys:Array<string> = Object.keys(data);
+  for (const key of keys) {
     if(!key){continue;}
-    array.push({memberAddress:key,memberRevisionCounter:iterator[key]});
+    array.push({memberAddress:key,memberRevisionCounter:data[key]});
   }
   return array;
 };
