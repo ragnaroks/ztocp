@@ -1,6 +1,5 @@
-import useSWR from 'swr/mutation';
-import {SWRMutationResponse} from 'swr/mutation';
-import {delay} from '../libraries/helper/function';
+import useSWRMutation from 'swr/mutation';
+import type {SWRMutationResponse} from 'swr/mutation';
 
 const defaultNetwork:ZerotierOneNetworkPatch = {
   name:'network-'+Date.now().toString(),
@@ -28,8 +27,7 @@ const defaultNetwork:ZerotierOneNetworkPatch = {
   v6AssignMode:{zt:false,rfc4193:false,'6plane':false}
 };
 
-const fetchAsync = async function(key:{url:string}) : Promise<ZerotierOneNetwork> {
-  await delay(500);
+async function fetchAsync(key:{url:string}) : Promise<ZerotierOneNetwork> {
   let response:Response|null = null;
   try{
     response = await fetch(key.url,{method:'POST',mode:'same-origin',body:JSON.stringify(defaultNetwork)});
@@ -48,11 +46,9 @@ const fetchAsync = async function(key:{url:string}) : Promise<ZerotierOneNetwork
   return data;
 };
 
-const usePostZerotierControllerNetworkCreate = function(address?:string) : SWRMutationResponse<ZerotierOneNetwork,string> {
-  return useSWR<ZerotierOneNetwork,string,undefined|{url:string}>(
-    address ? {url:'/zerotier/controller/network/'+address+'______'} : undefined,
-    fetchAsync
-  );
+function usePostZerotierControllerNetworkCreate(address?:string) : SWRMutationResponse<ZerotierOneNetwork,string,undefined|{url:string}> {
+  const key:undefined|{url:string} = address ? {url:'/zerotier/controller/network/'+address+'______'} : undefined;
+  return useSWRMutation<ZerotierOneNetwork,string,undefined|{url:string}>(key,fetchAsync);
 };
 
 export default usePostZerotierControllerNetworkCreate;

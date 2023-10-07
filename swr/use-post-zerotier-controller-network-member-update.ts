@@ -1,9 +1,7 @@
-import useSWR from 'swr/mutation';
-import {SWRMutationResponse} from 'swr/mutation';
-import {delay} from '../libraries/helper/function';
+import useSWRMutation from 'swr/mutation';
+import type {SWRMutationResponse} from 'swr/mutation';
 
-const fetchAsync = async function(key:{url:string},extra:{arg:ZerotierOneMemberPatch}) : Promise<ZerotierOneMember> {
-  await delay(500);
+async function fetchAsync(key:{url:string},extra:{arg:ZerotierOneMemberPatch}) : Promise<ZerotierOneMember> {
   let response:Response|null = null;
   try{
     response = await fetch(key.url,{method:'POST',mode:'same-origin',body:JSON.stringify(extra.arg)});
@@ -22,8 +20,8 @@ const fetchAsync = async function(key:{url:string},extra:{arg:ZerotierOneMemberP
   return data;
 };
 
-const usePostZerotierControllerNetworkMemberUpdate = function(networkId:null|string,memberAddress:null|string) : SWRMutationResponse<ZerotierOneMember,string,ZerotierOneMemberPatch> {
-  return useSWR<ZerotierOneMember,string,undefined|{url:string},ZerotierOneMemberPatch>(
+function usePostZerotierControllerNetworkMemberUpdate(networkId:null|string,memberAddress:null|string) : SWRMutationResponse<ZerotierOneMember,string,undefined|{url:string},ZerotierOneMemberPatch> {
+  return useSWRMutation<ZerotierOneMember,string,undefined|{url:string},ZerotierOneMemberPatch>(
     (networkId && memberAddress) ? {url:'/zerotier/controller/network/'+networkId+'/member/'+memberAddress} : undefined,
     fetchAsync
   );

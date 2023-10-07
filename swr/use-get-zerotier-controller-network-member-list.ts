@@ -1,9 +1,7 @@
 import useSWR from 'swr';
 import {SWRResponse} from 'swr';
-import {delay} from '../libraries/helper/function';
 
-const fetchAsync = async function(key:{url:string}) : Promise<Array<{memberAddress:string,memberRevisionCounter:number}>> {
-  await delay(500);
+async function fetchAsync(key:{url:string}) : Promise<Array<{memberAddress:string,memberRevisionCounter:number}>> {
   let response:Response|null = null;
   try{
     response = await fetch(key.url,{method:'GET',mode:'same-origin'});
@@ -28,7 +26,7 @@ const fetchAsync = async function(key:{url:string}) : Promise<Array<{memberAddre
   return array;
 };
 
-const useGetZerotierControllerNetworkMemberList = function(networkId:null|string) : SWRResponse<Array<{memberAddress:string,memberRevisionCounter:number}>,string> {
+function useGetZerotierControllerNetworkMemberList(networkId:null|string) : SWRResponse<Array<{memberAddress:string,memberRevisionCounter:number}>,string> {
   return useSWR<Array<{memberAddress:string,memberRevisionCounter:number}>,string,undefined|{url:string}>(
     networkId ? {url:'/zerotier/controller/network/'+networkId+'/member'} : undefined,
     fetchAsync,

@@ -2,7 +2,7 @@ import useSWR from 'swr/mutation';
 import {SWRMutationResponse} from 'swr/mutation';
 import {delay} from '../libraries/helper/function';
 
-const fetchAsync = async function(key:{url:string}) : Promise<ZerotierOneMember> {
+async function fetchAsync(key:{url:string}) : Promise<ZerotierOneMember> {
   await delay(500);
   let response:Response|null = null;
   try{
@@ -22,7 +22,7 @@ const fetchAsync = async function(key:{url:string}) : Promise<ZerotierOneMember>
   return data;
 };
 
-const useDeleteZerotierControllerNetworkMember = function(networkId:null|string,memberAddress:null|string) : SWRMutationResponse<ZerotierOneMember,string> {
+function useDeleteZerotierControllerNetworkMember(networkId:null|string,memberAddress:null|string) : SWRMutationResponse<ZerotierOneMember,string> {
   return useSWR<ZerotierOneMember,string,undefined|{url:string}>(
     (networkId && memberAddress) ? {url:'/zerotier/controller/network/'+networkId+'/member/'+memberAddress} : undefined,
     fetchAsync

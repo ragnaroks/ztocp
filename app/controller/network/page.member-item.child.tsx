@@ -34,11 +34,11 @@ export default function PageMemberItemChild(props:DefaultComponentProps & {
     if(!globalThis.self.confirm('确认删除成员 '+address+'？\n\n如果成员依然尝试加入，此处仍会再次显示。\n正确的做法是先在客户端 leave，再在此处取消授权，最后删除该成员。')){return;}
     deleteTrigger().then(function(stream){
       if(!stream){return;}
-      onDelete(stream.address)
+      onDelete(stream.address);
     }).catch(function(exception){
       toast.error('删除成员配置失败，'+exception);
     });
-  },[data,deleteTrigger]);
+  },[data,address,deleteTrigger,onDelete]);
 
   const patch = useCallback(function(patch:ZerotierOneMemberPatch){
     if(!data){return;}

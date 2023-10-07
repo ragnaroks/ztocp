@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const config = {
-  experimental:{
-    appDir:true
-  },
   output:'export',
   reactStrictMode: true,
   trailingSlash: true,

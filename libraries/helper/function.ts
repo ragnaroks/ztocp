@@ -5,7 +5,7 @@ import {Address4,Address6} from "ip-address";
  * @param millisecond 毫秒
  * @returns void
  */
-export const delay = function(millisecond:number) : Promise<void> {
+export function delay(millisecond:number) : Promise<void> {
   return new Promise(resolve=>setTimeout(resolve,millisecond));
 };
 
@@ -14,7 +14,7 @@ export const delay = function(millisecond:number) : Promise<void> {
  * @param subnet cidr
  * @returns boolean
  */
-export const validateRouteTarget = function(subnet:string) : boolean {
+export function validateRouteTarget(subnet:string) : boolean {
   if(Address6.isValid(subnet)){return new Address6(subnet).subnetMask <= 128;}
   if(Address4.isValid(subnet)){return new Address4(subnet).subnetMask <= 32;}
   return false;
@@ -25,7 +25,7 @@ export const validateRouteTarget = function(subnet:string) : boolean {
  * @param address 单一地址
  * @returns boolean
  */
-export const validateRouteVia = function(address:null|string) : boolean {
+export function validateRouteVia(address:null|string) : boolean {
   if(address===null){return true;}
   if(Address6.isValid(address)){return new Address6(address).subnetMask == 128;}
   if(Address4.isValid(address)){return new Address4(address).subnetMask == 32;}
@@ -37,7 +37,7 @@ export const validateRouteVia = function(address:null|string) : boolean {
  * @param address 地址
  * @returns 地址类型
  */
-export const validateAddress64 = function(address:string) : 0|4|6 {
+export function validateAddress64(address:string) : 0|4|6 {
   if(Address6.isValid(address)){return 6;}
   if(Address4.isValid(address)){return 4;}
   return 0;
@@ -48,7 +48,7 @@ export const validateAddress64 = function(address:string) : 0|4|6 {
  * @param subnet cidr
  * @returns 地址池
  */
-export const generateAssignmentPool = function(subnet:string) : null|{ipRangeStart:string,ipRangeEnd:string} {
+export function generateAssignmentPool(subnet:string) : null|{ipRangeStart:string,ipRangeEnd:string} {
   if(!validateRouteTarget(subnet)){return null;}
   const assignmentPool:{ipRangeStart:string,ipRangeEnd:string} = {ipRangeStart:'',ipRangeEnd:''};
   let family:number = 0;
@@ -75,7 +75,7 @@ export const generateAssignmentPool = function(subnet:string) : null|{ipRangeSta
  * @param routeArray 路由数组
  * @returns 地址池数组
  */
-export const generateAssignmentPoolArray = function(routeArray:Array<{target:string,via:null|string}>) : Array<{ipRangeStart:string,ipRangeEnd:string}> {
+export function generateAssignmentPoolArray(routeArray:Array<{target:string,via:null|string}>) : Array<{ipRangeStart:string,ipRangeEnd:string}> {
   if(routeArray.length<1){return [];}
   const assignmentPoolArray:Array<{ipRangeStart:string,ipRangeEnd:string}> = [];
   for (const iterator of routeArray) {
@@ -92,7 +92,7 @@ export const generateAssignmentPoolArray = function(routeArray:Array<{target:str
  * @param address 客户端 zerotier 地址（zerotier-cli info）
  * @returns IPv6 地址
  */
-export const generateZerotierRFC4193 = function(networkId:string,clientAddress:string='__________') : string {
+export function generateZerotierRFC4193(networkId:string,clientAddress:string='__________') : string {
   const format:string = `fd${networkId}9993${clientAddress}`.replace(/(.{4})/gi,'$1:');
   return format.length===39 ? format : format.slice(0,-1);
 };
@@ -104,7 +104,7 @@ export const generateZerotierRFC4193 = function(networkId:string,clientAddress:s
  * @returns IPv6 地址
  * @link https://zerotier.atlassian.net/wiki/spaces/SD/pages/7274520/Using+NDP+Emulated+6PLANE+Addressing+With+Docker
  */
-export const generateZerotier6PLANE = function(networkId:string,clientAddress:string='__________') : string {
+export function generateZerotier6PLANE(networkId:string,clientAddress:string='__________') : string {
   const networkIdByteArray:Array<string> = networkId.match(/.{2}/g) || [];
   if(networkIdByteArray.length!==8){return '';}
   const networkIdNumberArray:Array<number> = networkIdByteArray.map(item=>parseInt(item,16));
