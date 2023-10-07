@@ -1,280 +1,348 @@
-'use client';
-
-import {ReactElement, useCallback, useState, SyntheticEvent, MouseEvent} from 'react';
-import {toast} from 'react-hot-toast';
+import {ReactElement} from 'react';
 import {generateAssignmentPoolArray,generateZerotier6PLANE,generateZerotierRFC4193,validateRouteTarget, validateRouteVia} from '../../../libraries/helper/function';
-import useGetZerotierControllerNetwork from '../../../swr/use-get-zerotier-controller-network';
-import usePostZerotierControllerNetworkUpdate from '../../../swr/use-post-zerotier-controller-network-update';
+import {PostZerotierOneNetworkUpdate} from '../../../libraries/request/zerotier-one';
+import {revalidatePath} from 'next/cache';
+import PageNetworkNameUpdateChild from './page.network-name-update.child';
+import PageNetworkPrivateUpdateChild from './page.network-private-update.child';
+import PageNetworkEnableBroadcastUpdateChild from './page.network-enable-broadcast-update.child';
+import PageNetworkMulticastLimitUpdateChild from './page.network-multicast-limit-update.child';
+import PageNetworkV4AssignModeZtUpdateChild from './page.network-v4-assign-mode-zt-update.child';
+import PageNetworkV6AssignModeZtUpdateChild from './page.network-v6-assign-mode-zt-update.child';
+import PageNetworkV6AssignModeRfc4193UpdateChild from './page.network-v6-assign-mode-rfc4193-update.child';
+import PageNetworkV6AssignModeSixplaneUpdateChild from './page.network-v6-assign-mode-sixplane-update.child';
+import PageNetworkRouteAddChild from './page.network-route-add.child';
+import PageNetworkRouteDeleteChild from './page.network-route-delete';
+import PageNetworkDnsDomainUpdateChild from './page.network-dns-domain-update.child';
+import PageNetworkDnsServerAddChild from './page.network-dns-server-add.child';
+import PageNetworkDnsServerDeleteChild from './page.network-dns-server-delete';
 
-export default function PageConfigChild(props:DefaultComponentProps & {networkId:string}) : ReactElement {
-  const {className,networkId} = props;
+async function updateNetworkNameServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkName:null|FormDataEntryValue = formData.get('network-name');
+  if(networkName===null || typeof networkName!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{name:networkName});
+  revalidatePath('/controller/network/','page');
+};
 
-  const {isLoading,error,data,mutate} = useGetZerotierControllerNetwork(networkId);
-  const [temporaryRouteDestination,temporaryRouteDestinationSetter] = useState<string>('');
-  const [temporaryRouteVia,temporaryRouteViaSetter] = useState<string>('');
-  const [temporaryDnsServerAddress,temporaryDnsServerAddressSetter] = useState<string>('');
-  const {trigger:updateTrigger,isMutating:updateMutating} = usePostZerotierControllerNetworkUpdate(networkId);
+async function updateNetworkPrivateServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkPrivate:null|FormDataEntryValue = formData.get('network-private');
+  if(networkPrivate===null || typeof networkPrivate!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{private:networkPrivate==='true'});
+  revalidatePath('/controller/network/','page');
+};
 
-  const patch = useCallback(function(patch:ZerotierOneNetworkPatch){
-    if(!data){return;}
-    updateTrigger(patch).then(function(stream){
-      if(!stream){return;}
-      mutate(stream,{revalidate:false});
-    }).catch(function(exception){
-      toast.error('更新网络配置失败，'+exception);
-    });
-  },[data,updateTrigger,mutate]);
+async function updateNetworkEnableBroadcastServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkEnableBroadcast:null|FormDataEntryValue = formData.get('network-enable-broadcast');
+  if(networkEnableBroadcast===null || typeof networkEnableBroadcast!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{enableBroadcast:networkEnableBroadcast==='true'});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleBlurName = useCallback(function(event:SyntheticEvent<HTMLInputElement>){
-    if(!data || !event.currentTarget.value || data.name===event.currentTarget.value){return;}
-    patch({name:event.currentTarget.value});
-  },[data,patch]);
+async function updateNetworkMulticastLimitServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkMulticastLimit:null|FormDataEntryValue = formData.get('network-multicast-limit');
+  if(networkMulticastLimit===null || typeof networkMulticastLimit!=='string'){return;}
+  const value:number = parseInt(networkMulticastLimit) || 0;
+  await PostZerotierOneNetworkUpdate(networkId,{multicastLimit:value});
+  revalidatePath('/controller/network/','page');
+};
 
-  const changePrivate = useCallback(function(value:boolean){
-    if(!data || data.private===value){return;}
-    patch({private:value});
-  },[data,patch]);
+async function updateNetworkV4AssignModeZtServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const v4AssignModeZt:null|FormDataEntryValue = formData.get('network-v4-assign-mode-zt');
+  if(v4AssignModeZt===null || typeof v4AssignModeZt!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{v4AssignMode:{zt:v4AssignModeZt==='true'}});
+  revalidatePath('/controller/network/','page');
+};
 
-  const changeEnableBroadcast = useCallback(function(value:boolean){
-    if(!data || data.enableBroadcast===value){return;}
-    patch({enableBroadcast:value});
-  },[data,patch]);
+async function updateNetworkV6AssignModeZtServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const v6AssignModeZt:null|FormDataEntryValue = formData.get('network-v6-assign-mode-zt');
+  if(v6AssignModeZt===null || typeof v6AssignModeZt!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{v6AssignMode:{zt:v6AssignModeZt==='true'}});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleBlurMulticastLimit = useCallback(function(event:SyntheticEvent<HTMLInputElement>){
-    if(!globalThis || !globalThis.self || !globalThis.self.confirm){return;}
-    if(!data || !event.currentTarget.value || event.currentTarget.type!=='number' || event.currentTarget.valueAsNumber<0 || data.multicastLimit===event.currentTarget.valueAsNumber){return;}
-    if(event.currentTarget.valueAsNumber<1 && !globalThis.self.confirm('多播上限小于 1 时将导致 IPv4 网络停摆，确认操作？')){return;}
-    patch({multicastLimit:event.currentTarget.valueAsNumber});
-  },[data,patch]);
+async function updateNetworkV6AssignModeRfc4193ServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const v6AssignModeRfc4193:null|FormDataEntryValue = formData.get('network-v6-assign-mode-rfc4193');
+  if(v6AssignModeRfc4193===null || typeof v6AssignModeRfc4193!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{v6AssignMode:{rfc4193:v6AssignModeRfc4193==='true'}});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleClickV4AssignMode = useCallback(function(event:MouseEvent<HTMLInputElement>){
-    if(!data){return;}
-    const v4AssignMode:{zt:boolean} = {...data.v4AssignMode};
-    switch(event.currentTarget.value){
-      case 'zt':
-        v4AssignMode.zt = !v4AssignMode.zt;
-      break;
-      default:return;
-    }
-    patch({v4AssignMode:v4AssignMode});
-  },[data,patch]);
+async function updateNetworkV6AssignModeSixplaneServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const v6AssignMode6plane:null|FormDataEntryValue = formData.get('network-v6-assign-mode-6plane');
+  if(v6AssignMode6plane===null || typeof v6AssignMode6plane!=='string'){return;}
+  await PostZerotierOneNetworkUpdate(networkId,{v6AssignMode:{'6plane':v6AssignMode6plane==='true'}});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleClickV6AssignMode = useCallback(function(event:MouseEvent<HTMLInputElement>){
-    if(!data){return;}
-    const v6AssignMode:{zt:boolean,rfc4193:boolean,'6plane':boolean} = {...data.v6AssignMode};
-    switch(event.currentTarget.value){
-      case 'zt':
-        v6AssignMode.zt = !v6AssignMode.zt;
-      break;
-      case 'rfc4193':
-        v6AssignMode.rfc4193 = !v6AssignMode.rfc4193;
-      break;
-      case '6plane':
-        v6AssignMode['6plane'] = !v6AssignMode['6plane'];
-      break;
-      default:return;
-    }
-    patch({v6AssignMode:v6AssignMode});
-  },[data,patch]);
+async function addNetworkRouteServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkRoutes:null|FormDataEntryValue = formData.get('network-routes');
+  if(networkRoutes===null || typeof networkRoutes!=='string'){return;}
+  const routeTarget:null|FormDataEntryValue = formData.get('route-target');
+  if(routeTarget===null || typeof routeTarget!=='string'){return;}
+  const routeVia:null|FormDataEntryValue = formData.get('route-via');
+  if(routeVia!==null && typeof routeVia!=='string'){return;}
+  let routes:undefined|ZerotierOneNetworkPatch['routes'];
+  try{
+    routes = JSON.parse(networkRoutes) as ZerotierOneNetwork['routes'];
+  }catch{
+    return;
+  }
+  const route:{target:string,via:string|null} = {target:routeTarget,via:routeVia||null};
+  if(routes.some(x=>x.target===routeTarget) || !validateRouteVia(route.via) || !validateRouteTarget(route.target)){return;}
+  routes.push(route);
+  const ipAssignmentPools:ZerotierOneNetworkPatch['ipAssignmentPools'] = generateAssignmentPoolArray(routes);
+  await PostZerotierOneNetworkUpdate(networkId,{routes:routes,ipAssignmentPools:ipAssignmentPools});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleClickAddRoute = useCallback(function(){
-    /* 路由功能参考 https://jose.scjtqs.com/zhaji/2022-06-17-1845/zerotier-%e7%bb%84%e7%bd%91%e7%ae%80%e8%a6%81%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e.html */
-    if(!data || !temporaryRouteDestination){return;}
-    const route:{target:string,via:null|string} = {target:temporaryRouteDestination,via:temporaryRouteVia||null};
-    if(data.routes.some(item=>item.target===route.target)){
-      toast('路由 target 已存在');
-      return;
-    }
-    if(!validateRouteVia(route.via)){
-      toast.error('路由 via 格式错误');
-      return;
-    }
-    if(!validateRouteTarget(route.target)){
-      toast.error('路由 target 格式错误');
-      return;
-    }
-    const routes = [...data.routes,route];
-    const ipAssignmentPools = generateAssignmentPoolArray(routes);
-    patch({routes:routes,ipAssignmentPools:ipAssignmentPools});
-    temporaryRouteDestinationSetter('');
-    temporaryRouteViaSetter('');
-  },[data,temporaryRouteDestination,temporaryRouteVia,patch,temporaryRouteDestinationSetter,temporaryRouteViaSetter]);
+/* 路由功能参考 https://jose.scjtqs.com/zhaji/2022-06-17-1845/zerotier-%e7%bb%84%e7%bd%91%e7%ae%80%e8%a6%81%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e.html */
+async function deleteNetworkRouteServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkRoutes:null|FormDataEntryValue = formData.get('network-routes');
+  if(networkRoutes===null || typeof networkRoutes!=='string'){return;}
+  const routeTarget:null|FormDataEntryValue = formData.get('route-target');
+  if(routeTarget===null || typeof routeTarget!=='string'){return;}
+  const routeVia:null|FormDataEntryValue = formData.get('route-via');
+  if(routeVia!==null && typeof routeVia!=='string'){return;}
+  let routes:undefined|ZerotierOneNetworkPatch['routes'];
+  try{
+    routes = JSON.parse(networkRoutes) as ZerotierOneNetwork['routes'];
+  }catch{
+    return;
+  }
+  const index:number = routes.findIndex(x=>x.target===routeTarget);
+  if(index<0){return;}
+  routes.splice(index,1);
+  const ipAssignmentPools:ZerotierOneNetworkPatch['ipAssignmentPools'] = generateAssignmentPoolArray(routes);
+  await PostZerotierOneNetworkUpdate(networkId,{routes:routes,ipAssignmentPools:ipAssignmentPools});
+  revalidatePath('/controller/network/','page');
+};
 
-  const deleteRoute = useCallback(function(route:{target:string,via:null|string}){
-    if(!globalThis || !globalThis.self || !globalThis.self.confirm){return;}
-    if(!globalThis.self.confirm('确认删除路由 '+route.target+'？')){return;}
-    if(!data || !data.routes.some(item=>item.target===route.target)){return;}
-    const routes = data.routes.filter(item=>item.target!==route.target);
-    const ipAssignmentPools = generateAssignmentPoolArray(routes);
-    patch({routes:routes,ipAssignmentPools:ipAssignmentPools});
-  },[data,patch]);
+async function updateNetworkDnsDomainServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkDns:null|FormDataEntryValue = formData.get('network-dns');
+  if(networkDns===null || typeof networkDns!=='string'){return;}
+  const networkDnsDomain:null|FormDataEntryValue = formData.get('network-dns-domain');
+  if(networkDnsDomain===null || typeof networkDnsDomain!=='string'){return;}
+  let dns:undefined|ZerotierOneNetworkPatch['dns'];
+  try{
+    dns = JSON.parse(networkDns) as ZerotierOneNetwork['dns'];
+  }catch{
+    return;
+  }
+  dns.domain = networkDnsDomain;
+  await PostZerotierOneNetworkUpdate(networkId,{dns:dns});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleBlurDnsSearchDomain = useCallback(function(event:SyntheticEvent<HTMLInputElement>){
-    if(!globalThis || !globalThis.self || !globalThis.self.confirm){return;}
-    if(!data || data.dns.domain===event.currentTarget.value){return;}
-    const dns:{domain:string,servers:Array<string>} = {...data.dns};
-    dns.domain = event.currentTarget.value;
-    patch({dns:dns});
-  },[data,patch]);
+async function addNetworkDnsServerServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkDns:null|FormDataEntryValue = formData.get('network-dns');
+  if(networkDns===null || typeof networkDns!=='string'){return;}
+  const networkDnsServer:null|FormDataEntryValue = formData.get('network-dns-server');
+  if(networkDnsServer===null || typeof networkDnsServer!=='string'){return;}
+  let dns:undefined|ZerotierOneNetworkPatch['dns'];
+  try{
+    dns = JSON.parse(networkDns) as ZerotierOneNetwork['dns'];
+  }catch{
+    return;
+  }
+  if(!validateRouteVia(networkDnsServer) || dns.servers.includes(networkDnsServer)){return;}
+  dns.servers.push(networkDnsServer);
+  await PostZerotierOneNetworkUpdate(networkId,{dns:dns});
+  revalidatePath('/controller/network/','page');
+};
 
-  const handleClickAddDnsServer = useCallback(function(){
-    if(!data || !temporaryDnsServerAddress){return;}
-    if(data.dns.servers.some(item=>item===temporaryDnsServerAddress)){
-      toast('DNS 服务器已存在');
-      return;
-    }
-    if(!validateRouteVia(temporaryDnsServerAddress)){
-      toast.error('DNS 服务器格式错误');
-      return;
-    }
-    const dns:{domain:string,servers:Array<string>} = {...data.dns};
-    dns.servers.push(temporaryDnsServerAddress);
-    patch({dns:dns});
-    temporaryDnsServerAddressSetter('');
-  },[data,temporaryDnsServerAddress,patch,temporaryDnsServerAddressSetter]);
+async function deleteNetworkDnsServerServerAction(formData:FormData) : Promise<void> {
+  'use server';
+  const networkId:null|FormDataEntryValue = formData.get('network-id');
+  if(networkId===null || typeof networkId!=='string'){return;}
+  const networkDns:null|FormDataEntryValue = formData.get('network-dns');
+  if(networkDns===null || typeof networkDns!=='string'){return;}
+  const networkDnsServer:null|FormDataEntryValue = formData.get('network-dns-server');
+  if(networkDnsServer===null || typeof networkDnsServer!=='string'){return;}
+  let dns:undefined|ZerotierOneNetworkPatch['dns'];
+  try{
+    dns = JSON.parse(networkDns) as ZerotierOneNetwork['dns'];
+  }catch{
+    return;
+  }
+  const index:number = dns.servers.indexOf(networkDnsServer);
+  if(index<0){return;}
+  dns.servers.splice(index,1);
+  await PostZerotierOneNetworkUpdate(networkId,{dns:dns});
+  revalidatePath('/controller/network/','page');
+};
 
-  const deleteDnsServer = useCallback(function(server:string){
-    if(!globalThis || !globalThis.self || !globalThis.self.confirm){return;}
-    if(!globalThis.self.confirm('确认删除 DNS 服务器 '+server+'？')){return;}
-    if(!data || !data.dns.servers.some(item=>item===server)){return;}
-    const dns:{domain:string,servers:Array<string>} = {...data.dns};
-    dns.servers = dns.servers.filter(item=>item!==server);
-    patch({dns:dns});
-  },[data,patch]);
+export default async function PageConfigChild(props:{
+  networkData:null|ZerotierOneNetwork,
+  networkError:string
+}) : Promise<ReactElement> {
+  const {networkData,networkError} = props;
 
-  if(isLoading){return <div className={className+' animate-pulse'}>正在获取 {networkId} 的数据</div>;}
-  if(error || !data){return <div className={className}>获取 {networkId} 的数据失败，{error||'接口无响应'}</div>;}
-  return <div className={className}>
-    <fieldset className="flex items-center my-3">
+  if(networkError || !networkData){return <p className="px-4 py-2">获取网络设置失败，{networkError||'接口无响应'}</p>;}
+  return <div className="px-4">
+    <form className="flex items-center my-3" action={updateNetworkNameServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">名称：</span>
-      <input disabled={updateMutating} defaultValue={data.name} maxLength={63} className="flex-shrink-0 w-1/2 border border-stone-300/100 px-1" onBlur={handleBlurName} />
-      <span className="flex-1" />
-      <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100">失去焦点时自动提交</span>
-    </fieldset>
+      <PageNetworkNameUpdateChild networkName={networkData.name} />
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkPrivateServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-private" value={networkData.private?'false':'true'} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">访问控制：</span>
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="radio" value="false" readOnly checked={!data.private} onClick={()=>changePrivate(false)} />
-        <span>&nbsp;公开</span>
-      </label>
-      <span className="flex-shrink-0 w-24" />
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="radio" value="true" readOnly checked={data.private} onClick={()=>changePrivate(true)} />
-        <span>&nbsp;私有</span>
-      </label>
+      <PageNetworkPrivateUpdateChild networkPrivate={networkData.private} />
       <span className="flex-1" />
-      <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100"><strong>“公开”</strong>网络任何节点都可以免授权加入且无法移除</span>
-    </fieldset>
+      <span className="flex-shrink-0 text-sm text-stone-500/100">设置为<strong>“公开”</strong>则任何节点都可以免授权加入且无法移除</span>
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkEnableBroadcastServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-enable-broadcast" value={networkData.enableBroadcast?'false':'true'} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">广播控制：</span>
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="radio" value="false" readOnly checked={data.enableBroadcast} onClick={()=>changeEnableBroadcast(true)} />
-        <span>&nbsp;允许</span>
-      </label>
-      <span className="flex-shrink-0 w-24" />
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="radio" value="true" readOnly checked={!data.enableBroadcast} onClick={()=>changeEnableBroadcast(false)} />
-        <span>&nbsp;禁止</span>
-      </label>
+      <PageNetworkEnableBroadcastUpdateChild networkEnableBroadcast={networkData.enableBroadcast} />
       <span className="flex-1" />
       <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100">如果不知道作用保持<strong>“允许”</strong>即可</span>
-    </fieldset>
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkMulticastLimitServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">多播上限：</span>
-      <input disabled={updateMutating} type="number" min={0} max={32768} defaultValue={data.multicastLimit} className="flex-shrink-0 w-24 border border-stone-300/100 px-1" onBlur={handleBlurMulticastLimit} />
+      <PageNetworkMulticastLimitUpdateChild networkMulticastLimit={networkData.multicastLimit} />
       <span className="flex-1" />
-      <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100">如果不知道作用保持<strong>“32”</strong>即可</span>
-    </fieldset>
+      <span className="flex-shrink-0 text-sm text-stone-500/100">多播上限小于 <strong>“1”</strong> 时将导致 IPv4 网络异常，如果不知道作用保持<strong>“32”</strong>即可</span>
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkV4AssignModeZtServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-v4-assign-mode-zt" value={networkData.v4AssignMode.zt?'false':'true'} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">IPv4：</span>
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="checkbox" readOnly value="zt" checked={data.v4AssignMode.zt} onClick={handleClickV4AssignMode} />
-        <span>&nbsp;从地址池中自动分配</span>
-      </label>
-    </fieldset>
+      <PageNetworkV4AssignModeZtUpdateChild zt={networkData.v4AssignMode.zt} />
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkV6AssignModeZtServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-v6-assign-mode-zt" value={networkData.v6AssignMode.zt?'false':'true'} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">IPv6：</span>
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="checkbox" readOnly value="zt" checked={data.v6AssignMode.zt} onClick={handleClickV6AssignMode} />
-        <span>&nbsp;从地址池中自动分配</span>
-      </label>
-      <span className="flex-shrink-0 w-24" />
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="checkbox" readOnly value="rfc4193" checked={data.v6AssignMode.rfc4193} onClick={handleClickV6AssignMode} />
-        <span>&nbsp;ZeroTier RFC4193（{generateZerotierRFC4193(networkId)}）</span>
-      </label>
-      <span className="flex-shrink-0 w-24" />
-      <label className="flex-shrink-0 text-sm flex items-center">
-        <input disabled={updateMutating} type="checkbox" readOnly value="6plane" checked={data.v6AssignMode['6plane']} onClick={handleClickV6AssignMode} />
-        <span>&nbsp;ZeroTier 6PLANE（{generateZerotier6PLANE(networkId)}）</span>
-      </label>
-    </fieldset>
+      <PageNetworkV6AssignModeZtUpdateChild zt={networkData.v6AssignMode.zt} />
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
-      <span className="flex-shrink-0 w-24 text-sm">托管路由：</span>
-      <div className="w-7/12 flex items-center">
-        <input disabled={updateMutating} placeholder="192.168.144.0/24" value={temporaryRouteDestination} maxLength={42} className="flex-1 border border-stone-300/100 px-1" onChange={event=>temporaryRouteDestinationSetter(event.currentTarget.value.trim())} />
-        <span className="flex-shrink-0 px-4 text-sm">via</span>
-        <input disabled={updateMutating} placeholder="留空为默认路由" value={temporaryRouteVia} maxLength={38} className="flex-1 border border-stone-300/100 px-1" onChange={event=>temporaryRouteViaSetter(event.currentTarget.value.trim())} />
-      </div>
+    <form className="flex items-center my-3" action={updateNetworkV6AssignModeRfc4193ServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-v6-assign-mode-rfc4193" value={networkData.v6AssignMode.rfc4193?'false':'true'} readOnly />
+      <span className="flex-shrink-0 w-24 text-sm">IPv6：</span>
+      <PageNetworkV6AssignModeRfc4193UpdateChild rfc4193={networkData.v6AssignMode.rfc4193} />
       <span className="flex-1" />
-      <button disabled={updateMutating} className="flex-shrink-0 w-16 h-6 text-sm bg-site-zerotier/100 disabled:bg-stone-300/100 disabled:text-stone-500/100 disabled:animate-pulse" onClick={handleClickAddRoute}>增加</button>
-    </fieldset>
-    <ul className="my-3">{data.routes.map(function(item){
-      return <li key={item.target} className="my-3 flex text-sm">
-        <span className="flex-shrink-0 w-24" />
-        <div className="w-7/12 flex">
-          <span className="flex-1 px-1">{item.target}</span>
-          <span className="flex-shrink-0 px-4">via</span>
-          <span className="flex-1 px-1">{item.via||'默认路由'}</span>
-        </div>
-        <span className="flex-1" />
-        <button disabled={updateMutating} className="flex-shrink-0 w-16 h-6 text-sm border border-site-zerotier/100 text-orange-500/100 disabled:bg-stone-300/100 disabled:text-stone-500/100 disabled:border-none disabled:animate-pulse" onClick={()=>deleteRoute(item)}>删除</button>
-      </li>;
-    })}</ul>
+      <span className="flex-shrink-0 text-sm text-stone-500/100">{generateZerotierRFC4193(networkData.id)}</span>
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkV6AssignModeSixplaneServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-v6-assign-mode-6plane" value={networkData.v6AssignMode['6plane']?'false':'true'} readOnly />
+      <span className="flex-shrink-0 w-24 text-sm">IPv6：</span>
+      <PageNetworkV6AssignModeSixplaneUpdateChild sixplane={networkData.v6AssignMode['6plane']} />
+      <span className="flex-1" />
+      <span className="flex-shrink-0 text-sm text-stone-500/100">{generateZerotier6PLANE(networkData.id)}</span>
+    </form>
+    <hr />
+    <hr />
+    <form className="flex items-center my-3" action={addNetworkRouteServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-routes" value={JSON.stringify(networkData.routes)} readOnly />
+      <span className="flex-shrink-0 w-24 text-sm">托管路由：</span>
+      <PageNetworkRouteAddChild />
+    </form>
+    <div className="my-3">{networkData.routes.map(function(item){
+      return <form key={item.target} className="my-3 flex text-sm" action={deleteNetworkRouteServerAction}>
+        <input type="hidden" name="network-id" value={networkData.id} readOnly />
+        <input type="hidden" name="network-routes" value={JSON.stringify(networkData.routes)} readOnly />
+        <input type="hidden" name="route-target" value={item.target} readOnly />
+        <span className="flex-shrink-0 w-24" />
+        <span className="flex-shrink-0 w-80 px-1">{item.target}</span>
+        <span className="flex-shrink-0 px-4">via</span>
+        <span className="flex-shrink-0 w-80 px-1">{item.via||'默认路由'}</span>
+        <span className="flex-shrink-0 w-4" />
+        <PageNetworkRouteDeleteChild />
+      </form>;
+    })}</div>
+    <hr />
+    <div className="flex items-center my-3">
       <span className="flex-shrink-0 w-24 text-sm">托管地址池：</span>
       <span className="flex-shrink-0 text-sm">强制与托管路由同步（可以被 zerotier 处理的地址必定是托管路由中定义的子网）</span>
       <span className="flex-1" />
-    </fieldset>
-    <ul className="my-3">{data.ipAssignmentPools.map(function(item){
+    </div>
+    <ul className="my-3">{networkData.ipAssignmentPools.map(function(item){
       return <li key={`${item.ipRangeStart}-to-${item.ipRangeEnd}`} className="my-3 text-sm pl-24">{item.ipRangeStart}&nbsp;-&nbsp;{item.ipRangeEnd}</li>;
     })}</ul>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={updateNetworkDnsDomainServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-dns" value={JSON.stringify(networkData.dns)} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">DNS 搜索域：</span>
-      <input disabled={updateMutating} placeholder="home.arpa" maxLength={255} defaultValue={data.dns.domain} className="flex-shrink-0 w-1/2 border border-stone-300/100 px-1" onBlur={handleBlurDnsSearchDomain} />
+      <PageNetworkDnsDomainUpdateChild networkDnsDomain={networkData.dns.domain} />
       <span className="flex-1" />
       <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100">如果不知道作用保持<strong>“空值”</strong>即可</span>
-    </fieldset>
+    </form>
     <hr />
-    <fieldset className="flex items-center my-3">
+    <form className="flex items-center my-3" action={addNetworkDnsServerServerAction}>
+      <input type="hidden" name="network-id" value={networkData.id} readOnly />
+      <input type="hidden" name="network-dns" value={JSON.stringify(networkData.dns)} readOnly />
       <span className="flex-shrink-0 w-24 text-sm">DNS 服务器：</span>
-      <input disabled={updateMutating} placeholder="10.0.0.53" value={temporaryDnsServerAddress} maxLength={39} className="flex-shrink-0 w-96 border border-stone-300/100 px-1" onChange={event=>temporaryDnsServerAddressSetter(event.currentTarget.value.trim())} />
+      <PageNetworkDnsServerAddChild />
       <span className="flex-1" />
-      <button disabled={updateMutating} className="flex-shrink-0 w-16 h-6 text-sm bg-site-zerotier/100 disabled:bg-stone-300/100 disabled:text-stone-500/100 disabled:animate-pulse" onClick={handleClickAddDnsServer}>增加</button>
-    </fieldset>
-    <ul className="my-3">{data.dns.servers.map(function(item){
-      return <li key={item} className="my-3 flex text-sm">
+      <span className="flex-shrink-0 pl-4 text-sm text-stone-500/100">如果不知道作用保持<strong>“清空”</strong>即可</span>
+    </form>
+    <div className="my-3">{networkData.dns.servers.map(function(item){
+      return <form key={item} className="my-3 flex text-sm" action={deleteNetworkDnsServerServerAction}>
+        <input type="hidden" name="network-id" value={networkData.id} readOnly />
+        <input type="hidden" name="network-dns" value={JSON.stringify(networkData.dns)} readOnly />
+        <input type="hidden" name="network-dns-server" value={item} readOnly />
         <span className="flex-shrink-0 w-24" />
-        <span className="flex-shrink-0 px-1">{item}</span>
-        <span className="flex-1" />
-        <button disabled={updateMutating} className="flex-shrink-0 w-16 h-6 text-sm border border-site-zerotier/100 text-orange-500/100 disabled:bg-stone-300/100 disabled:text-stone-500/100 disabled:border-none disabled:animate-pulse" onClick={()=>deleteDnsServer(item)}>删除</button>
-      </li>;
-    })}</ul>
+        <span className="flex-shrink-0 w-80 px-1">{item}</span>
+        <span className="flex-shrink-0 w-4" />
+        <PageNetworkDnsServerDeleteChild />
+      </form>;
+    })}</div>
     <hr />
     <fieldset className="flex items-center my-3">
       <span className="flex-shrink-0 w-24 text-sm">规则：</span>
       <span className="flex-shrink-0 text-sm">暂不支持通过此界面修改（主要是不会）</span>
       <span className="flex-1" />
     </fieldset>
-    <ul className="my-3">{data.rules.map(function(item){
+    <ul className="my-3">{networkData.rules.map(function(item){
       return <li key={`${item.type}-${item.etherType}-${item.not}-${item.or}`} className="my-3 text-sm pl-24">
         <span className="inline-block w-1/4">type：{item.type}</span>
         <span className="inline-block w-1/4">etherType：{item.etherType||'未定义'}</span>

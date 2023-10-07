@@ -35,14 +35,13 @@
   },
   "include": [
     "next-env.d.ts",
-    "types/*.d.ts",
     "app/**/*.tsx",
     "app/**/*.ts",
     "assets/**/*.ts",
     "components/*.tsx",
     "libraries/**/*.ts",
-    "recoil/*.ts",
-    "swr/*.ts",
+    "types/*.d.ts",
+    "middleware.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

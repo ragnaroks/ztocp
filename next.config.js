@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const config = {
-  output:'export',
+  output:'standalone',
+  experimental:{
+    serverActions:true
+  },
   reactStrictMode: true,
   trailingSlash: true,
-  compress: false,
+  compress: true,
   poweredByHeader: false,
   env:{},
   publicRuntimeConfig:{},

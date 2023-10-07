@@ -15,6 +15,7 @@ export function delay(millisecond:number) : Promise<void> {
  * @returns boolean
  */
 export function validateRouteTarget(subnet:string) : boolean {
+  if(subnet===''){return false;}
   if(Address6.isValid(subnet)){return new Address6(subnet).subnetMask <= 128;}
   if(Address4.isValid(subnet)){return new Address4(subnet).subnetMask <= 32;}
   return false;
@@ -27,6 +28,7 @@ export function validateRouteTarget(subnet:string) : boolean {
  */
 export function validateRouteVia(address:null|string) : boolean {
   if(address===null){return true;}
+  if(address===''){return false;}
   if(Address6.isValid(address)){return new Address6(address).subnetMask == 128;}
   if(Address4.isValid(address)){return new Address4(address).subnetMask == 32;}
   return false;

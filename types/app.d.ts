@@ -2,6 +2,11 @@ declare type DefaultComponentProps = {className?:string,style?:import('react').C
 
 declare type DefaultContainerProps = {children?:import('react').ReactNode};
 
+declare type DefaultPageProps = {
+  params:{slug:string},
+  searchParams:{[key:string]:string|undefined}
+};
+
 declare type ZerotierOneStatus = {
   address:string,
   clock:number,
@@ -83,8 +88,8 @@ declare type ZerotierOneNetworkPatch = {
   rulesSource?:string,
   ssoEnabled?:boolean,
   tags?:Array<unknown>,
-  v4AssignMode?:{zt:boolean},
-  v6AssignMode?:{'6plane':boolean,rfc4193:boolean,zt:boolean}
+  v4AssignMode?:{zt?:boolean},
+  v6AssignMode?:{'6plane'?:boolean,rfc4193?:boolean,zt?:boolean}
 };
 
 declare type ZerotierOneMember = {

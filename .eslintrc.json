@@ -1,7 +1,7 @@
 {
   "parser":"@typescript-eslint/parser",
   "extends": "next/core-web-vitals",
-  "plugins": ["react-hooks","@typescript-eslint/eslint-plugin"],
+  "plugins": ["react-hooks","@next/eslint-plugin-next"],
   "globals":{
     "window":true
   },
@@ -14,8 +14,8 @@
     "object-shorthand": ["error", "never"],
     "space-before-function-paren": ["error", "never"],
     "space-infix-ops":["off"],
-    /*"no-unused-vars":["warn"],*/
-    "@typescript-eslint/no-unused-vars":["warn"],
+    "no-unused-vars":["warn"],
+    // "@typescript-eslint/no-unused-vars":["warn"],
     "new-cap":["off"],
     "comma-spacing":["off"],
     "object-curly-spacing":["error","never"],
